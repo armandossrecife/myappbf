@@ -1,0 +1,7 @@
+fastapi 
+bcrypt 
+pydantic 
+sqlalchemy
+python-jose[cryptography]
+httpx 
+pytest
