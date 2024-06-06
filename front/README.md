@@ -2,7 +2,7 @@
 
 Frontend exemplo de Protótipo de Aplicação Web (Prova de Conceito) de CRUD de usuários e imagens
 
-[Quadro de Atividades do Projeto](http://TBD)
+[Quadro de Atividades do Projeto Frontend](http://TBD)
 
 # A. Ambiente de Desenvolvimento
 
