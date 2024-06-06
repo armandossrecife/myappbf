@@ -1,0 +1,6 @@
+pip install Flask
+
+Overview of the Flaks Frontend Web Application
+https://docs.google.com/document/d/1KyDS6I4dT25tOQslii1Y0-F8tRH9GaOzbqfiQtTKSkU/edit?usp=sharing
+
+flask --app main run --host=0.0.0.0 --port=5000

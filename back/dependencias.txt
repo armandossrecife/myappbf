@@ -1,0 +1,8 @@
+pip3 install fastapi bcrypt pydantic sqlalchemy
+pip3 install python-jose[cryptography]
+pip3 install httpx pytest
+
+Overview of the FastAPI Application
+https://docs.google.com/document/d/1E8QYMgsawNVASWFHHU_ii1VbgwUiLRE4a-kui_ZyN4A/edit?usp=sharing
+
+uvicorn main:app --reload
