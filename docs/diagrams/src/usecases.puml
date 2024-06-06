@@ -1,0 +1,41 @@
+@startuml
+skinparam actorStyle awesome
+
+' Actor definition
+actor User
+
+' Usecase definition
+usecase (Register) as uc_register
+usecase (Login) as uc_login
+usecase (Logout) as uc_logout
+usecase (Password \nrecover) as uc_password_recover
+usecase (My Profile) as uc_my_profile
+usecase (Dashboard \nUser) as uc_dashboard_user
+usecase (Manage My Images) as uc_manage_image
+usecase (Insert Image) as uc_private_image
+usecase (List My \nImages) as uc_list_private_image
+usecase (Delete Image) as uc_delete_private_image
+usecase (Select Image) as uc_select_private_image
+usecase (View Image) as uc_view_private_image
+usecase (Search My \nImages) as uc_search_private_image
+usecase (List Result \nImages) as uc_list_result_images
+
+uc_dashboard_user -> uc_manage_image
+uc_manage_image --> uc_private_image
+uc_manage_image --> uc_list_private_image
+uc_manage_image --> uc_search_private_image
+uc_search_private_image --> uc_list_result_images
+uc_list_result_images --> uc_select_private_image
+uc_list_private_image --> uc_select_private_image
+uc_select_private_image --> uc_delete_private_image
+uc_select_private_image --> uc_view_private_image 
+
+uc_register <- User
+User -> uc_password_recover
+User --> uc_login
+uc_login --> uc_dashboard_user
+
+uc_dashboard_user --> uc_logout
+uc_dashboard_user -left-> uc_my_profile
+
+@enduml

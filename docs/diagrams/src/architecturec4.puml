@@ -1,0 +1,32 @@
+@startuml MyImages
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/html5.puml
+!include DEVICONS/python.puml
+!include DEVICONS/sqllite.puml
+!include FONTAWESOME/users.puml
+
+Person(user, "User")
+Container(web_client, "Browser", "html", "The main interface that the customer interacts with", $sprite="html5") 
+
+System_Boundary(c1, "MyImages Web Aplication") {    
+    Container(web_app_back, "Web Application Backend", "Python, FastAPI", "Allows frontend app to manage images", $sprite="python")
+    Container(web_app_front, "Web Application Frontend", "Python, Flask", "Allows users to manage images", $sprite="python")
+    ContainerDb(db, "Database", "SQlite", "Holds users and images information", $sprite="sqllite")
+    Container(archive, "Archive", "File Images")
+}
+System_Ext(mail_system, "E-mail system")
+
+Rel_Down(user, web_client, "Uses")
+Rel_Down(web_client, web_app_front, "Uses", "https")
+Rel_Down(web_app_front, web_app_back, "Uses", "https")
+Rel_R(web_app_back,db, "Reads/Writes")
+Rel_Down(web_app_back, archive, "Writes", "files")
+Rel_L(web_app_back, mail_system, "Create e-mail")
+Rel_Up(mail_system, user, "Send e-mail")
+
+SHOW_LEGEND()
+
+@enduml
