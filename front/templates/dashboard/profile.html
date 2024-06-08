@@ -13,12 +13,13 @@
               <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
                   <div class="text-center">
-                    <a href="{{ url_for("usuarios.update", id=id) }}"><img class="profile-user-img img-fluid img-circle" src="{{ url_for('static', filename='dist/img/anonymous2.png') }}" alt="User profile picture"></a>
+                   
+                    <a href="#"> <img class="profile-user-img img-fluid img-circle" src="{{ url_for('static', filename=filename) }}" alt="User profile picture"> </a>
                   </div>
   
                   <h3 class="profile-username text-center">{{usuario}} </h3>
   
-                  <p class="text-muted text-center">Software Engineer</p>
+                  <p class="text-muted text-center">TBD</p>
   
                   <ul class="list-group list-group-unbordered mb-3">
                     <li class="list-group-item">
@@ -140,24 +141,30 @@
                     <!-- /.tab-pane -->
   
                     <div class="active tab-pane" id="settings">
-                      <form class="form-horizontal" action="{{ id + '/salva' }}" method="post">
+                      <form class="form-horizontal" action="/profile" method="get">
                         <div class="form-group row">
                           <label for="inputName" class="col-sm-2 col-form-label">Name</label>
                           <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputName" placeholder="Name" value="{{nome}}" name="name">
+                            <input type="text" class="form-control" id="inputName" placeholder="Name" value="{{nome}}" name="name" disabled>
                           </div>
                         </div>
                         <input type="hidden" id="inputName" value="{{id}}" name="id">
                         <div class="form-group row">
                           <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
                           <div class="col-sm-10">
-                            <input type="email" class="form-control" id="inputEmail" placeholder="Email" value={{email}} name="email">
+                            <input type="email" class="form-control" id="inputEmail" placeholder="Email" value={{email}} name="email" disabled>
                           </div>
                         </div>
                         <div class="form-group row">
                           <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
                             <div class="col-sm-10">
                               <input type="password" class="form-control" id="inputPassword" placeholder="Password" value="??????" name="password">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                          <label for="inputPassword" class="col-sm-2 col-form-label">Confirm Password</label>
+                            <div class="col-sm-10">
+                              <input type="password" class="form-control" id="inputPassword2" placeholder="Password" value="??????" name="password2">
                             </div>
                         </div>
                           
