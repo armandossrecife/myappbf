@@ -1,14 +1,21 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash, url_for, send_from_directory
 import requests
+import os
 
 app = Flask(__name__)
 app.secret_key = "my_secret_key"  # Replace with a strong secret key for session management
+
+STATIC_PATH = os.path.join(app.root_path, 'static')
 
 # Define API base URL (replace with your actual FastAPI URL)
 API_URL = "http://localhost:8000"  # Replace with your FastAPI app's URL and port
 
 # Criar um DAO para acessar as imagens dos usuarios
 # imageProfileDAO
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(STATIC_PATH, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route("/")
 def index():
