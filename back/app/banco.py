@@ -2,12 +2,11 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String, Table
-import utilidades
-import entidades
 from sqlalchemy import ForeignKey
+from app import utilidades
+from app import entidades
 import os
 
-BACKEND_PATH = os.getcwd()
 DATABASE_URL = "sqlite:///users.db"
 engine = create_engine(DATABASE_URL)
 
@@ -44,6 +43,13 @@ def create_tables():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
     print("Tables criadas")
+
+def get_db():
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()
 
 def get_user(db: SessionLocal, username: str):
     try: 
