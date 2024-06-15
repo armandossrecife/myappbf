@@ -2,10 +2,18 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 import bcrypt
 import string
+import os
 
 SECRET_KEY = "your_secret_key"  # Replace with a strong secret key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+API_PORT = "8000"
+API_URL = f"http://localhost:{API_PORT}"
+CURRENT_PATH = os.getcwd()
+IMAGES_PATH = os.path.join(CURRENT_PATH, 'images')
+IMAGES_PATH_PROFILE = os.path.join(IMAGES_PATH, 'profile')
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}  # Add more extensions as needed
 
 def hash_password(password: str) -> str:
     # Recommended work factor based on current hardware speeds
