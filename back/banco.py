@@ -1,10 +1,15 @@
 import sqlalchemy 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Table
 import utilidades
 import entidades
+from sqlalchemy import ForeignKey
+from uuid import uuid4
+import os
+from fastapi import UploadFile
 
+BACKEND_PATH = os.getcwd()
 DATABASE_URL = "sqlite:///users.db"
 engine = create_engine(DATABASE_URL)
 
@@ -18,6 +23,24 @@ class UserDB(Base):
   email = Column(String, unique=True, index=True)
   password_hash = Column(String)
 
+class File(Base):
+    __tablename__ = "files"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(length=250), nullable=False)
+
+class UserFilesDB(Base):
+    __tablename__ = "user_files"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    file_id = Column(Integer, ForeignKey('files.id'))
+
+class ImageProfile(Base):
+    __tablename__ = "image_profile"
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    name = Column(String(250), nullable=False)
+    # Optional: Add a field to store the image file path
+    file_path = Column(String(250))
+
 def create_tables():
     print("Recriando as tabelas...")
     Base.metadata.drop_all(engine)
@@ -25,8 +48,12 @@ def create_tables():
     print("Tables criadas")
 
 def get_user(db: SessionLocal, username: str):
-    return db.query(UserDB).filter(UserDB.username == username).first()
-
+    try: 
+        user = db.query(UserDB).filter(UserDB.username == username).first()
+        return user
+    except Exception as ex:
+        raise ValueError(f'Erro ao consultar usuario {username}')
+     
 def get_user_by_id(db: SessionLocal, user_id: int):
     return db.query(UserDB).filter(UserDB.id == user_id).first()
 
@@ -57,6 +84,32 @@ def get_all_users(db: SessionLocal):
   users = db.query(UserDB).all()
   return [entidades.User(id=user.id, username=user.username, email=user.email, password="?") for user in users]
 
+def get_image_profile_for_user(db: SessionLocal, user_id: int):
+    try: 
+        image_profile = db.query(ImageProfile).get(user_id)
+        if image_profile:
+            image_name = image_profile.name
+            return image_name
+        else:
+            return "default.png"
+    except Exception as ex:
+        raise ValueError('Erro ao fazer a busca da imagem')
+
+def add_profile_image_to_user(db: SessionLocal, user_id: int, filename: str):
+    try:
+        db = SessionLocal()
+        existing_image = get_image_profile_for_user(db, user_id)
+        if existing_image:
+            # Update existing image record
+            update_image = ImageProfile(user_id=user_id, name=filename)
+            db.merge(update_image)
+        else:
+            # Create a new image record
+            new_image = ImageProfile(user_id=user_id, name=filename)
+            db.add(new_image)
+        db.commit()
+    except Exception as e:
+        raise ValueError(f"Error adding profile image: {str(e)}")
 
 # Call the create_tables function outside your application code (e.g., in a separate script)
 create_tables()

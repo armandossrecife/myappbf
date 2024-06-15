@@ -13,8 +13,7 @@
               <div class="card card-primary card-outline">
                 <div class="card-body box-profile">
                   <div class="text-center">
-                   
-                    <a href="#"> <img class="profile-user-img img-fluid img-circle" src="{{ url_for('static', filename=filename) }}" alt="User profile picture"> </a>
+                    <a href="{{ url_for('update_profile_image') }}"> <img class="profile-user-img img-fluid img-circle" src="{{ filename }}" alt="User profile picture"> </a>
                   </div>
   
                   <h3 class="profile-username text-center">{{usuario}} </h3>
