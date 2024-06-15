@@ -52,3 +52,11 @@ flask --app main run --host=0.0.0.0 --port=5000
 ```
 
 Abra o browser: http://localhost:5000/login
+
+## Flask frontend review
+
+https://docs.google.com/document/d/18dNSvBeZ-Ji6WL9jrgi468BCAzoJJKyjhowf5yxAlg0/edit?usp=sharing
+
+## AdminLTE review
+
+https://docs.google.com/document/d/1mgGSvdUIWNY7x4scjPTaJktxT_j2794COigfYlWTSME/edit?usp=sharing
