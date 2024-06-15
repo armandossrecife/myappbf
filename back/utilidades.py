@@ -1,19 +1,13 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 import bcrypt
+import string
 
 SECRET_KEY = "your_secret_key"  # Replace with a strong secret key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 5
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def hash_password(password: str) -> str:
-    """Hashes a plain text password using bcrypt with a strong work factor.
-    Args:
-        password: The plain text password to hash.
-    Returns:
-        The hashed password as a base64 encoded string.
-    """
-
     # Recommended work factor based on current hardware speeds
     work_factor = 14  # Adjust as needed, higher is more secure but slower
     salt = bcrypt.gensalt(work_factor)
@@ -23,13 +17,6 @@ def hash_password(password: str) -> str:
     return hashed_password.decode("utf-8")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifies a plain text password against a hashed password using bcrypt.
-    Args:
-        plain_password: The plain text password to verify.
-        hashed_password: The hashed password to compare against.
-    Returns:
-        True if the passwords match, False otherwise.
-    """
     hashed_password = hashed_password.encode("utf-8")
     return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password)
     
@@ -45,3 +32,14 @@ def verify_token(token: str, credentials_exception=None):
     return payload["sub"]
   except JWTError:
     raise credentials_exception
+
+def validate_filename(filename: str) -> str:
+    """Sanitizes filename to prevent potential vulnerabilities.
+    Args:
+        filename (str): The filename to sanitize.
+    Returns:
+        str: The sanitized filename.
+    """
+    allowed_chars = set(string.ascii_letters + string.digits + "-_.")
+    sanitized_filename = "".join([char for char in filename if char in allowed_chars])
+    return sanitized_filename
