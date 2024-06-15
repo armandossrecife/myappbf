@@ -47,3 +47,6 @@ Abra o browser: http://localhost:8000/docs
 ## 4. Overview da aplicação
 
 https://docs.google.com/document/d/1E8QYMgsawNVASWFHHU_ii1VbgwUiLRE4a-kui_ZyN4A/edit?usp=sharing
+
+FastAPI backend review
+https://docs.google.com/document/d/1mBNrYlrtHHlRcOyCSKadlsosLWAQUtsysH0kwCPsZiw/edit?usp=sharing
