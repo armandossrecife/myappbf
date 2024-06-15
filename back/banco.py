@@ -5,9 +5,7 @@ from sqlalchemy import Column, Integer, String, Table
 import utilidades
 import entidades
 from sqlalchemy import ForeignKey
-from uuid import uuid4
 import os
-from fastapi import UploadFile
 
 BACKEND_PATH = os.getcwd()
 DATABASE_URL = "sqlite:///users.db"
@@ -52,27 +50,37 @@ def get_user(db: SessionLocal, username: str):
         user = db.query(UserDB).filter(UserDB.username == username).first()
         return user
     except Exception as ex:
-        raise ValueError(f'Erro ao consultar usuario {username}')
+        raise ValueError(f'Erro ao consultar usuario: {username}')
      
 def get_user_by_id(db: SessionLocal, user_id: int):
-    return db.query(UserDB).filter(UserDB.id == user_id).first()
+    try:
+        user = db.query(UserDB).filter(UserDB.id == user_id).first()
+        return user
+    except Exception as ex:
+        raise ValueError(f"Erro ao consultar usuario: {str(ex)}")
 
 def create_user(user: entidades.User):
-    db = SessionLocal()
-    hashed_password = utilidades.hash_password(user.password)
-    db_user = UserDB(username=user.username, email=user.email, password_hash=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return entidades.User(id=db_user.id, username=db_user.username, email=db_user.email, password=user.password)
+    try:
+        db = SessionLocal()
+        hashed_password = utilidades.hash_password(user.password)
+        db_user = UserDB(username=user.username, email=user.email, password_hash=hashed_password)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return entidades.User(id=db_user.id, username=db_user.username, email=db_user.email, password=user.password)
+    except Exception as ex:
+        raise ValueError(f"Erro ao criar usuário: {str(ex)}")
 
 def authenticate_user(db: SessionLocal, username: str, password: str):
-    user = get_user(db, username)
-    if not user:
-        return False
-    if not utilidades.verify_password(password, user.password_hash):
-        return False
-    return user
+    try:
+        user = get_user(db, username)
+        if not user:
+            return False
+        if not utilidades.verify_password(password, user.password_hash):
+            return False
+        return user
+    except Exception as ex:
+        raise ValueError(f"Erro ao autenticar usuário: {str(ex)}")
 
 def get_all_users(db: SessionLocal):
   """Retrieves all users from the database.
@@ -81,8 +89,11 @@ def get_all_users(db: SessionLocal):
   Returns:
       A list of User objects representing all users in the database.
   """
-  users = db.query(UserDB).all()
-  return [entidades.User(id=user.id, username=user.username, email=user.email, password="?") for user in users]
+  try:
+    users = db.query(UserDB).all()
+    return [entidades.User(id=user.id, username=user.username, email=user.email, password="?") for user in users]
+  except Exception as ex:
+    raise ValueError(f"Erro ao recuperar usuários: {str(ex)}")
 
 def get_image_profile_for_user(db: SessionLocal, user_id: int):
     try: 
@@ -93,7 +104,7 @@ def get_image_profile_for_user(db: SessionLocal, user_id: int):
         else:
             return "default.png"
     except Exception as ex:
-        raise ValueError('Erro ao fazer a busca da imagem')
+        raise ValueError(f'Erro ao fazer a busca da imagem {str(ex)}')
 
 def add_profile_image_to_user(db: SessionLocal, user_id: int, filename: str):
     try:
