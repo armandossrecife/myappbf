@@ -50,3 +50,9 @@ https://docs.google.com/document/d/1E8QYMgsawNVASWFHHU_ii1VbgwUiLRE4a-kui_ZyN4A/
 
 FastAPI backend review
 https://docs.google.com/document/d/1mBNrYlrtHHlRcOyCSKadlsosLWAQUtsysH0kwCPsZiw/edit?usp=sharing
+
+## 5. Execução dos testes automáticos
+
+```bash
+python3 -m pytest
+```
