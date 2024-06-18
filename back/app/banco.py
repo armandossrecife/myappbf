@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from app import utilidades
 from app import entidades
 from app import modelos
+from datetime import datetime
 
 DATABASE_URL = "sqlite:///users.db"
 engine = create_engine(DATABASE_URL)
@@ -20,6 +21,8 @@ def get_db():
     yield db
   finally:
     db.close()
+
+### Users operations ###
 
 def get_user(db: SessionLocal, username: str):
     try: 
@@ -97,3 +100,54 @@ def add_profile_image_to_user(db: SessionLocal, user_id: int, filename: str):
         db.commit()
     except Exception as e:
         raise ValueError(f"Error adding profile image: {str(e)}")
+
+### Notes operations ###
+
+def create_note(db: SessionLocal, user_id: int, description: str) -> entidades.Note:
+  try:
+    new_note = modelos.NoteDB(description=description, user_id=user_id)
+    db.add(new_note)
+    db.commit()
+    db.refresh(new_note)
+    return entidades.Note(id=new_note.id, description=new_note.description, insertion_date=new_note.insertion_date, edition_date=new_note.edition_date)
+  except Exception as ex:
+    raise ValueError(f"Error creating note: {str(ex)}, status_code=400")
+
+def get_all_notes_by_user(db: SessionLocal, user_id: int) -> list[entidades.Note]:
+  try:
+    notes = db.query(modelos.NoteDB).filter(modelos.NoteDB.user_id == user_id).all()
+    return [entidades.Note(id=note.id, description=note.description, insertion_date=note.insertion_date, edition_date=note.edition_date) for note in notes]
+  except Exception as ex:
+    raise ValueError(f"Error retrieving notes: {str(ex)}, status_code=500")
+
+def get_note_by_id(db: SessionLocal, note_id: int) -> entidades.Note:
+  try:
+    note = db.query(modelos.NoteDB).filter(modelos.NoteDB.id == note_id).first()
+    if not note:
+      raise ValueError("Note not found")
+    return entidades.Note(id=note.id, description=note.description, insertion_date=note.insertion_date, edition_date=note.edition_date)
+  except Exception as ex:
+    raise ValueError(f"Error retrieving note: {str(ex)}, status_code=500")
+
+def update_note(db: SessionLocal, note_id: int, user_id: int, description: str) -> entidades.Note:
+  try:
+    note = db.query(modelos.NoteDB).filter(modelos.NoteDB.id == note_id and modelos.NoteDB.user_id==user_id).first()
+    if not note:
+      raise ValueError("Note not found")
+    note.description = description
+    note.edition_date = datetime.utcnow()  # Update edition date
+    db.commit()
+    db.refresh(note)
+    return entidades.Note(id=note.id, description=note.description, insertion_date=note.insertion_date, edition_date=note.edition_date)
+  except Exception as ex:
+    raise ValueError(f"Error updating note: {str(ex)}, status_code=400")
+
+def delete_note(db: SessionLocal, note_id: int, user_id: int) -> None:
+  try:
+    note = db.query(modelos.NoteDB).filter(modelos.NoteDB.id == note_id and modelos.NoteDB.user_id==user_id).first()
+    if not note:
+      raise ValueError("Note not found")
+    db.delete(note)
+    db.commit()
+  except Exception as ex:
+    raise ValueError(f"Error deleting note: {str(ex)}, status_code=400")
