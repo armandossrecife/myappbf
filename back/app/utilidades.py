@@ -39,7 +39,10 @@ def verify_token(token: str, credentials_exception=None):
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     return payload["sub"]
   except JWTError:
-    raise credentials_exception
+    # raise credentials_exception
+    raise ValueError('Erro de credencial!')
+  except Exception as ex:
+    raise ValueError(f'Erro ao verificar o token: {str(ex)}')
 
 def validate_filename(filename: str) -> str:
     """Sanitizes filename to prevent potential vulnerabilities.
