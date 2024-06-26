@@ -10,7 +10,7 @@
 
               <div class="info-box-content">
                 <span class="info-box-text">Usuários</span>
-                <span class="info-box-number">{{quantidade_usuarios}}</span>
+                <span class="info-box-number">{{dadosDashboardDTO.quantidade_usuarios}}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -23,7 +23,7 @@
 
               <div class="info-box-content">
                 <span class="info-box-text">Imagens</span>
-                <span class="info-box-number">{{quantidade_imagens}}</span>
+                <span class="info-box-number">{{ dadosDashboardDTO.quantidade_imagens }}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -36,7 +36,7 @@
 
               <div class="info-box-content">
                 <span class="info-box-text">Análises</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-number">{{ dadosDashboardDTO.quantidade_analises }}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -48,8 +48,8 @@
               <span class="info-box-icon bg-danger"><i class="far fa-star"></i></span>
 
               <div class="info-box-content">
-                <span class="info-box-text">Notas</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-text"><a href="{{ url_for('listar_notas') }}">Notas</a></span>
+                <span class="info-box-number">{{ dadosDashboardDTO.quantidade_notas }}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
