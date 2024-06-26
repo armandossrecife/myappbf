@@ -250,5 +250,43 @@ def update_profile_image():
 
     return render_template("auth/login.html", error_message=error_message)
 
+
+@app.route("/notas", methods=['GET'])
+def listar_notas():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    try:
+        usuario = session["username"]
+        #filename_picture = user_data["profile_image_url"]   
+        filename_picture = "http://localhost:8000/users/armando/profile/profile-pic.png"
+        return render_template("notas/listar_notas.html", usuario = usuario, titulo="Notas", profilePic=filename_picture)
+    except Exception as ex:
+        error_message = f"Erro: {str(ex)}"
+    flash(error_message)
+
+    return render_template("notas/listar_notas.html", error_message=error_message)
+
+@app.route("/nota", methods=['GET', 'POST'])
+def nova_nota():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    if request.method == 'POST':
+     pass
+     return 
+
+    try:
+        usuario = session["username"]
+        #filename_picture = user_data["profile_image_url"]   
+        filename_picture = "http://localhost:8000/users/armando/profile/profile-pic.png"
+        return render_template("notas/nova_nota.html", usuario = usuario, titulo="Nova Nota", profilePic=filename_picture)
+    except Exception as ex:
+        error_message = f"Erro: {str(ex)}"
+    flash(error_message)
+
+    return render_template("notas/listar_notas.html", error_message=error_message)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
