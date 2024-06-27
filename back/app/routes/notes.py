@@ -23,7 +23,8 @@ async def create_note(username: str, nota: entidades.Note, db: Session = Depends
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     try:
-        created_note = banco.create_note(db, user.id, nota.description)
+        notes_dao = banco.NotesDAO(db)
+        created_note = notes_dao.create_note(user.id, nota.description)
         return created_note
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error creating note: {str(e)}")
@@ -45,7 +46,8 @@ async def get_all_notes(username: str, db: Session = Depends(banco.get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     try:
-        all_notes = banco.get_all_notes_by_user(db, user.id)
+        notes_dao = banco.NotesDAO(db)
+        all_notes = notes_dao.get_all_notes_by_user(user.id)
         return all_notes
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error retrieving notes: {str(e)}")
@@ -68,7 +70,8 @@ async def get_note_by_id(username: str, note_id: int, db: Session = Depends(banc
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     try:
-        specific_note = banco.get_note_by_id(db, note_id)
+        notes_dao = banco.NotesDAO(db)
+        specific_note = notes_dao.get_note_by_id(note_id)
         if not specific_note:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
         return specific_note
@@ -94,7 +97,8 @@ async def update_note(username: str, note_id: int, description: str, db: Session
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     try:
-        existing_note = banco.get_note_by_id(db, note_id)
+        notes_dao = banco.NotesDAO(db)
+        existing_note = notes_dao.get_note_by_id(db, note_id)
         if not existing_note:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
 
@@ -123,7 +127,8 @@ async def delete_note(username: str, note_id: int, db: Session = Depends(banco.g
 
     try:
         # Call the delete function from banco (assuming it exists)
-        deleted = banco.delete_note(db, note_id, user.id)
+        notes_dao = banco.NotesDAO(db)
+        deleted = notes_dao.delete_note(db, note_id, user.id)
         if not deleted:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
 
