@@ -60,3 +60,35 @@ https://docs.google.com/document/d/1mBNrYlrtHHlRcOyCSKadlsosLWAQUtsysH0kwCPsZiw/
 ```bash
 python3 -m pytest
 ```
+
+# B. Descrição da estrutura da aplicação
+
+Segue uma breve descrição dos diretórios e arquivos:
+
+**back/app**: O diretório (pacote) raiz da sua aplicação.
+
+**back/app/routes**: diretório que contém as rotas aplicação. Os arquivos auth.py, notes.py, profile.py e users.py definem as rotas e a lógica associada a cada uma delas.
+
+**back/app/entidades.py**: módulo que contém as definições das classes de entidade da aplicação. 
+
+**back/app/modelos.py**: módulo que contém as definições das classes de modelo da aplicação. 
+
+**back/app/seguranca.py**: módulo que contém as definições de controle de acesso usando OAuth2PasswordBearer
+
+**back/app/utilidades.py**: módulo que contem funções de hash e tokens da aplicação backend.
+
+**back/app/banco.py**: módulo de acesso ao banco de dados.
+
+**back/testes**: diretório contendo a implementação dos casos de testes automáticos da aplicação.
+
+**back/main.py**: O ponto de entrada da aplicação FastAPI, onde você cria a instância do aplicativo e registra as rotas da aplicação backend.
+
+**back/exec.sh**: Script que inicia a aplicação backend.
+
+**back/README.md**: Um arquivo de documentação contendo informações sobre a aplicação backend.
+
+**back/requirements.txt**: Um arquivo que lista as dependências do projeto.
+
+**back/users.db**: O arquivo de banco de dados SQLite onde os dados dos usuários são armazenados.
+
+**back/images**: Pasta (file system) que armazena os arquivos dos usuários.
