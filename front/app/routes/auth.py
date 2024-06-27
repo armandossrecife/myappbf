@@ -20,7 +20,7 @@ def login():
                 session["username"] = username
                 session["access_token"] = data["access_token"]
                 session['profile_image_url'] = None                
-                return redirect(url_for("dashboard"))
+                return redirect(url_for("dashboard.dashboard"))
             elif response.status_code == 401: 
                 error_message = "401 Unauthorized for invalid credentials"                             
             else:
