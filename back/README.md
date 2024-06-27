@@ -2,7 +2,7 @@
 
 Backend exemplo de Protótipo de Aplicação Web (Prova de Conceito) de CRUD de usuários e imagens
 
-[Quadro de Atividades do Projeto Backend](http://TBD)
+[Quadro de Atividades do Projeto Backend](https://github.com/users/armandossrecife/projects/1)
 
 # A. Ambiente de Desenvolvimento
 
@@ -40,6 +40,10 @@ pip3 install -r requirements.txt
 
 ```bash
 uvicorn main:app --reload
+```
+ou 
+```bash
+./exec.sh
 ```
 
 Abra o browser: http://localhost:8000/docs
