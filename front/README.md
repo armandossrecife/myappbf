@@ -63,3 +63,23 @@ https://docs.google.com/document/d/18dNSvBeZ-Ji6WL9jrgi468BCAzoJJKyjhowf5yxAlg0/
 ## AdminLTE review
 
 https://docs.google.com/document/d/1mgGSvdUIWNY7x4scjPTaJktxT_j2794COigfYlWTSME/edit?usp=sharing
+
+# B. Descrição da estrutura da aplicação 
+
+Segue uma breve descrição dos diretórios e arquivos:
+
+**front/app**: O diretório (pacote) raiz da sua aplicação frontend.
+
+**front/app/routes**: diretório contendo a implementação das rotas da aplicação frontend.
+
+**front/static**: diretório que contem os arquivos e recursos estáticos da aplicação frontend.
+
+**front/templates**: O diretório que contém os templates HTML usados para renderizar as páginas da aplicação frontend. Os templates estão organizados em subdiretórios, como auth/ e usuarios/, correspondendo as rotas das quais eles pertencem.
+
+**front/main.py**: O ponto de entrada da aplicação Flask, onde você cria a instância do aplicativo frontend e registra os blueprints (routes).
+
+**front/exec.sh**: Script para inicializar a aplicação frontend.
+
+**front/README.md**: Um arquivo de documentação contendo informações sobre o projeto.
+
+**front/requirements.txt**: Um arquivo que lista as dependências do projeto.
