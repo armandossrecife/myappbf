@@ -2,7 +2,7 @@
 
 Frontend exemplo de Protótipo de Aplicação Web (Prova de Conceito) de CRUD de usuários e imagens
 
-[Quadro de Atividades do Projeto Frontend](http://TBD)
+[Quadro de Atividades do Projeto Frontend](https://github.com/users/armandossrecife/projects/2)
 
 # A. Ambiente de Desenvolvimento
 
@@ -39,9 +39,6 @@ pip3 install -r requirements.txt
 ## 3. É preciso configurar as variáveis de ambiente da aplicação
 
 ```bash
-export FLASK_APP=run.py && export FLASK_ENV=development
-```
-```bash
 export MY_SECRET_KEY=?????????
 ```
 
@@ -49,6 +46,12 @@ export MY_SECRET_KEY=?????????
 
 ```bash
 flask --app main run --host=0.0.0.0 --port=5000
+```
+
+ou 
+
+```bash
+.\exec.sh
 ```
 
 Abra o browser: http://localhost:5000/login
