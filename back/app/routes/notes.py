@@ -17,7 +17,8 @@ async def create_note(username: str, nota: entidades.Note, db: Session = Depends
     Raises:
         HTTPException: If note creation fails.
     """
-    user = banco.get_user(db, username)
+    user_dao = banco.UserDAO(db)
+    user = user_dao.get_user(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
@@ -38,7 +39,8 @@ async def get_all_notes(username: str, db: Session = Depends(banco.get_db)):
     Raises:
         HTTPException: If user is not found or unauthorized to access notes.
     """
-    user = banco.get_user(db, username)
+    user_dao = banco.UserDAO(db)
+    user = user_dao.get_user(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
@@ -60,8 +62,8 @@ async def get_note_by_id(username: str, note_id: int, db: Session = Depends(banc
     Raises:
         HTTPException: If user is not found, unauthorized to access notes, or note is not found.
     """
-
-    user = banco.get_user(db, username)
+    user_dao = banco.UserDAO(db)
+    user = user_dao.get_user(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
@@ -86,7 +88,8 @@ async def update_note(username: str, note_id: int, description: str, db: Session
     Raises:
         HTTPException: If user is not found, unauthorized to access notes, or note is not found.
     """
-    user = banco.get_user(db, username)
+    user_dao = banco.UserDAO(db)
+    user = user_dao.get_user(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
@@ -113,7 +116,8 @@ async def delete_note(username: str, note_id: int, db: Session = Depends(banco.g
     Raises:
         HTTPException: If user is not found, unauthorized to access notes, or note is not found.
     """
-    user = banco.get_user(db, username)
+    user_dao = banco.UserDAO(db)
+    user = user_dao.get_user(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 

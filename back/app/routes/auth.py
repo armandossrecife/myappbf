@@ -10,7 +10,8 @@ router = APIRouter()
 # Todo: melhorar o acesso e registro do access_token
 @router.post("/login")
 async def login(user_login: entidades.UserLogin, db: Session = Depends(banco.get_db)):
-  user = banco.authenticate_user(db, user_login.username, user_login.password)
+  user_dao = banco.UserDAO(db)
+  user = user_dao.authenticate_user(user_login.username, user_login.password)
   if not user:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect username or password")
   global access_token
