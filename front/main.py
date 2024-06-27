@@ -1,15 +1,22 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for, send_from_directory, make_response
+from flask import Flask, render_template, request, redirect, session 
+from flask import flash, url_for, send_from_directory, make_response
 import requests
 import os
 from app import dto
+from app.routes import auth
+from app import utilidades
 
 my_app = Flask(__name__)
 my_app.secret_key = "my_secret_key"  # Replace with a strong secret key for session management
 
 STATIC_PATH = os.path.join(my_app.root_path, 'static')
-# Define API base URL (replace with your actual FastAPI URL)
-API_PORT = "8000"
-API_URL = f"http://localhost:{API_PORT}"  # Replace with your FastAPI app's URL and port
+
+#Registra os Blueprints
+my_app.register_blueprint(auth.auth_bp)
+
+def mapa_rotas():
+    print("Mapa de rotas da aplicação: ")
+    print(my_app.url_map)
 
 @my_app.route('/favicon.ico')
 def favicon():
@@ -21,118 +28,28 @@ def index():
         return redirect(url_for("dashboard"))
     return render_template("auth/login.html")
 
-@my_app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        # Send login request to FastAPI app
-        login_data = {"username": username, "password": password}
-        url_router = f"{API_URL}/login"
-        try:
-            response = requests.post(url_router, json=login_data)
-            if response.status_code == 200:
-                data = response.json()
-                session["username"] = username
-                session["access_token"] = data["access_token"]
-                session['profile_image_url'] = None                
-                return redirect(url_for("dashboard"))
-            elif response.status_code == 401: 
-                error_message = "401 Unauthorized for invalid credentials"                             
-            else:
-                error_message = "Invalid username or password"
-        except requests.exceptions.MissingSchema:
-            error_message = f"URL {API_URL}/login inválida"
-        except requests.exceptions.ConnectionError:
-            error_message = "Erro de conexão na tentativa do login"
-        except IOError: 
-            error_message = "Erro de IO durante o login"
-        flash(error_message, category='danger')
-
-        return render_template("auth/login.html", error_message=error_message)
-
-    return render_template("auth/login.html")
-
-# Pagina de registro
-@my_app.route("/register", methods=['GET', 'POST'])
-def register():
-    """
-    Register a new user.
-    Validates that the username is not already taken. Hashes the password for security.
-    """
-    if request.method == "POST":
-        name = request.form["name"]
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
-        repassword = request.form["repassword"]
-        
-        error_message = None
-
-        if not username:
-            error_message = "Username is required."
-        elif not email: 
-            error_message = "E-mail is required."
-        elif not password:
-            error_message = "Password is required."
-        elif password != repassword: 
-            error_message = "Password is not correct."
-
-        if error_message is None:
-            try: 
-                # Send user data to FastAPI app
-                user_data = {"id": 0, "username": username, "email":email, "password": password}
-                url_router = f"{API_URL}/users"
-                response = requests.post(url_router, json=user_data)
-                if response.status_code == 200:
-                    mensagem = f"Usuário {username} criado com sucesso!"
-                    flash(mensagem, category='success')
-                    return redirect(url_for("login"))
-                else: 
-                    error_message = f"User {username} is already registered."
-                
-            except requests.exceptions.MissingSchema:
-                error_message = f"URL {API_URL}/users inválida"
-            except requests.exceptions.ConnectionError:
-                error_message = "Erro de conexão na tentativa do login"
-            except IOError: 
-                error_message = "Erro de IO durante o login"
-        
-        flash(error_message, category='danger')                
-        return render_template("auth/register.html", error_message=error_message)
-    return render_template("auth/register.html")
-
-# Pagina de recuperacao de e-mail
-@my_app.route("/forgot-password", methods=["GET"])
-def forgot():
-    return render_template("auth/forgot-password.html")
-
-@my_app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
 
 @my_app.route("/dashboard")
 def dashboard():
     if "username" not in session:
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     try:
         # Retrieve user information from FastAPI app using token
         access_token = session["access_token"] 
         headers = {"Authorization": f"Bearer {access_token}"}
         usuario_logado = session['username']
-        url_router = f"{API_URL}/users/{usuario_logado}"
+        url_router = f"{utilidades.API_URL}/users/{usuario_logado}"
         response = requests.get(url_router, headers=headers)
     
         if response.status_code == 200:
             user_data = response.json()            
-            url_route_profile = f"{API_URL}/users/{usuario_logado}/profile"
+            url_route_profile = f"{utilidades.API_URL}/users/{usuario_logado}/profile"
             response_profile = requests.get(url_route_profile, headers=headers)
 
             if response_profile.status_code == 200:
                 user_data_profile = response_profile.json()
-                url_route_all_notes = f"{API_URL}/users/{usuario_logado}/notes"
+                url_route_all_notes = f"{utilidades.API_URL}/users/{usuario_logado}/notes"
                 session['profile_image_url'] = user_data_profile['profile_image_url']
                 response_all_notes = requests.get(url_route_all_notes, headers=headers)
                 
@@ -162,14 +79,14 @@ def dashboard():
 @my_app.route("/profile")
 def profile():
     if "username" not in session:
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     try:
         # Recupera informacoes do backend usando o token
         access_token = session["access_token"] 
         headers = {"Authorization": f"Bearer {access_token}"}
         usuario_logado = session["username"]
-        url_route = f"{API_URL}/users/{usuario_logado}/profile"
+        url_route = f"{utilidades.API_URL}/users/{usuario_logado}/profile"
         response = requests.get(url_route, headers=headers)
 
         if response.status_code == 200:
@@ -197,13 +114,13 @@ def profile():
 @my_app.route("/profile/imagem", methods=['GET', 'POST'])
 def update_profile_image():    
     if "username" not in session:
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     try: 
         access_token = session["access_token"]
         headers = {"Authorization": f"Bearer {access_token}"}
         usuario_logado = session["username"]
-        url_route = f"{API_URL}/users/{usuario_logado}/profile"
+        url_route = f"{utilidades.API_URL}/users/{usuario_logado}/profile"
 
         if request.method == "POST":
             username = request.form["username"]
@@ -250,19 +167,19 @@ def update_profile_image():
 @my_app.route("/notas", methods=['GET'])
 def listar_notas():
     if "username" not in session:
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     try:
         # Recupera informacoes do backend usando o token
         access_token = session["access_token"] 
         headers = {"Authorization": f"Bearer {access_token}"}
         usuario_logado = session["username"]
-        url_route = f"{API_URL}/users/{usuario_logado}/profile"
+        url_route = f"{utilidades.API_URL}/users/{usuario_logado}/profile"
         response = requests.get(url_route, headers=headers)
 
         if response.status_code == 200:
             user_data = response.json() 
-            url_route_all_notes = f"{API_URL}/users/{usuario_logado}/notes"
+            url_route_all_notes = f"{utilidades.API_URL}/users/{usuario_logado}/notes"
             response_all_notes = requests.get(url_route_all_notes, headers=headers)
             if response_all_notes.status_code == 200:
                 notes_data = response_all_notes.json()
@@ -288,7 +205,7 @@ def listar_notas():
 @my_app.route("/nota", methods=['GET', 'POST'])
 def nova_nota():
     if "username" not in session:
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     # Recupera informacoes do backend usando o token
     access_token = session["access_token"] 
@@ -305,7 +222,7 @@ def nova_nota():
             try: 
                 # Send user data to FastAPI app
                 descricao_data = {'id': 0, "description": descricao}
-                response = requests.post(f"{API_URL}/users/{usuario_logado}/notes", json=descricao_data, headers=headers)
+                response = requests.post(f"{utilidades.API_URL}/users/{usuario_logado}/notes", json=descricao_data, headers=headers)
 
                 if response.status_code == 200:
                     mensagem = f"Nota criada com sucesso!"
@@ -315,7 +232,7 @@ def nova_nota():
                     error_message = f"Erro {response.status_code} ao cadastrar a nota!: {response.content}"
                 
             except requests.exceptions.MissingSchema:
-                error_message = f"URL {API_URL}/notes inválida!"
+                error_message = f"URL {utilidades.API_URL}/notes inválida!"
             except requests.exceptions.ConnectionError:
                 error_message = "Erro de conexão na tentativa de cadastro de nota."
             except IOError: 
