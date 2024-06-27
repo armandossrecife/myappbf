@@ -4,9 +4,9 @@ Exemplo de Protótipo de Aplicação Web (Prova de Conceito) de CRUD de usuário
 
 A aplicação é dividida em dois contextos principais: uma aplicação backend (usando FastAPI) e uma aplicação frontend (usando Flask)
 
-back - diretório da aplicação backend
+[back](https://github.com/armandossrecife/myappbf/tree/main/back) - diretório da aplicação backend
 
-front - diretório da aplicação frontend
+[front](https://github.com/armandossrecife/myappbf/tree/main/front) - diretório da aplicação frontend
 
 # A. Tecnologias e configurações do projeto
 
