@@ -28,7 +28,7 @@
     <div class="card-body login-card-body">
       <p class="login-box-msg">Sign in to start your session</p>
 
-      <form action="{{ url_for('login') }}" method="POST">
+      <form action="{{ url_for('auth.login') }}" method="POST">
         <div class="input-group mb-3">
           <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="">
           <div class="input-group-append">
@@ -63,24 +63,23 @@
       </form>
 
       <p class="mb-1">
-        <a href="{{ url_for('forgot') }}">I forgot my password</a>
+        <a href="{{ url_for('auth.forgot') }}">I forgot my password</a>
       </p>
       <p class="mb-0">
-        <a href="{{ url_for('register' )}}" class="text-center">Register a new membership</a>
+        <a href="{{ url_for('auth.register') }}" class="text-center">Register a new membership</a>
       </p>
     </div>
     <!-- /.login-card-body -->
   </div>
 
   {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="callout callout-danger">
-      {% for message in get_flashed_messages() %}
-        {{ message }}
-      {% endfor %}
-  
-    </div>  
-    {% endif %}
+      {% if messages %}
+      <div class="callout callout-info">
+        {% for message in get_flashed_messages() %}
+          {{ message }}
+        {% endfor %}
+      </div>  
+      {% endif %}
   {% endwith %}
 </div>
 <!-- /.login-box -->
