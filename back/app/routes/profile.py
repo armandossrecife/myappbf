@@ -13,11 +13,12 @@ router = APIRouter()
 @router.get("/users/{username}/profile")
 async def get_user_profile(username: str, db: Session = Depends(banco.get_db)):
     try: 
-      user = banco.get_user(db, username)
+      user_dao = banco.UserDAO(db)
+      user = user_dao.get_user(username)
       if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-      image_profile_name = banco.get_image_profile_for_user(db, user.id) 
+      image_profile_name = user_dao.get_image_profile_for_user(user.id) 
       image_url = f"{utilidades.API_URL}/users/{username}/profile/{image_profile_name}"
       image_default = f"{utilidades.API_URL}/users/{username}/profile/default.png"
       content = {
@@ -34,7 +35,8 @@ async def get_user_profile(username: str, db: Session = Depends(banco.get_db)):
 # Todo: check token from current user@router.get("/users/{username}/profile/{filename}", dependencies=[Depends(seguranca.get_current_user)])
 @router.get("/users/{username}/profile/{filename}")
 async def show_image_profile(filename: str, username: str, db: Session = Depends(banco.get_db)):
-    user = banco.get_user(db, username)
+    user_dao = banco.UserDAO(db)
+    user = user_dao.get_user(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     try:      
@@ -49,7 +51,8 @@ async def show_image_profile(filename: str, username: str, db: Session = Depends
 
 @router.post("/users/{username}/profile", dependencies=[Depends(seguranca.get_current_user)])
 async def upload_image_prolife(image: UploadFile, username: str, db: Session = Depends(banco.get_db)):
-    user = banco.get_user(db, username)
+    user_dao = banco.UserDAO(db)
+    user = user_dao.get_user(username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
@@ -68,7 +71,7 @@ async def upload_image_prolife(image: UploadFile, username: str, db: Session = D
       with open(filepath, "wb") as f:
         f.write(contents)
         image_url = f"{utilidades.API_URL}/users/{username}/profile/{image.filename}"
-      banco.add_profile_image_to_user(db, user.id, filename)
+      user_dao.add_profile_image_to_user(user.id, filename)
       
       content = {"message": f"Image profile uploaded successfully: {image.filename}", 
           "filename":image.filename,

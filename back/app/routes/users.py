@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
 from sqlalchemy.orm import Session
-from fastapi.responses import FileResponse
 from app import entidades
-from app import utilidades
 from app import banco
 from app import seguranca
 
@@ -10,14 +8,16 @@ router = APIRouter()
 
 @router.get("/users/{username}", dependencies=[Depends(seguranca.get_current_user)])
 async def get_user_by_username(username: str, db: Session = Depends(banco.get_db)):
-  user = banco.get_user(db, username)
+  user_dao = banco.UserDAO(db)
+  user = user_dao.get_user(username)
   if not user:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   return entidades.User(id=user.id, username=user.username, email=user.email, password="?")
 
 @router.get("/users/{user_id}", dependencies=[Depends(seguranca.get_current_user)])
 async def get_user_by_id(user_id: int, db: Session = Depends(banco.get_db)):
-  user = banco.get_user_by_id(db, user_id)
+  user_dao = banco.UserDAO(db)
+  user = user_dao.get_user_by_id(user_id)
   if not user:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   return entidades.User(id=user.id, username=user.username, email=user.email, password="?")
@@ -33,7 +33,9 @@ async def create_user(user: entidades.User):
       HTTPException: If user creation fails.
   """
   try:
-      created_user = banco.create_user(user)
+      db = banco.get_db()
+      user_dao = banco.UserDAO(db)
+      created_user = user_dao.create_user(user)
       return created_user
   except Exception as e:
       raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error creating user: {str(e)}")
