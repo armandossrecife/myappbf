@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import datetime
 
 class User(BaseModel):
   id: int
@@ -14,5 +13,3 @@ class UserLogin(BaseModel):
 class Note(BaseModel):
   id: int
   description: str
-  insertion_date: datetime
-  edition_date: datetime

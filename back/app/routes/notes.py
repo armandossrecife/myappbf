@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import banco
 from app import seguranca
+from app import entidades
 
 router = APIRouter()
 
 @router.post("/users/{username}/notes", dependencies=[Depends(seguranca.get_current_user)])
-async def create_note(username: str, description: str, db: Session = Depends(banco.get_db)):
+async def create_note(username: str, nota: entidades.Note, db: Session = Depends(banco.get_db)):
     """ Creates a new note for the user identified by username.
     Args:
         username: Username of the user creating the note.
@@ -21,7 +22,7 @@ async def create_note(username: str, description: str, db: Session = Depends(ban
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     try:
-        created_note = banco.create_note(db, user.id, description)
+        created_note = banco.create_note(db, user.id, nota.description)
         return created_note
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error creating note: {str(e)}")

@@ -28,12 +28,14 @@ def login():
         password = request.form["password"]
         # Send login request to FastAPI app
         login_data = {"username": username, "password": password}
+        url_router = f"{API_URL}/login"
         try:
-            response = requests.post(f"{API_URL}/login", json=login_data)
+            response = requests.post(url_router, json=login_data)
             if response.status_code == 200:
                 data = response.json()
                 session["username"] = username
                 session["access_token"] = data["access_token"]
+                session['profile_image_url'] = None                
                 return redirect(url_for("dashboard"))
             elif response.status_code == 401: 
                 error_message = "401 Unauthorized for invalid credentials"                             
@@ -45,7 +47,7 @@ def login():
             error_message = "Erro de conexão na tentativa do login"
         except IOError: 
             error_message = "Erro de IO durante o login"
-        flash(error_message)
+        flash(error_message, category='danger')
 
         return render_template("auth/login.html", error_message=error_message)
 
@@ -80,10 +82,11 @@ def register():
             try: 
                 # Send user data to FastAPI app
                 user_data = {"id": 0, "username": username, "email":email, "password": password}
-                response = requests.post(f"{API_URL}/users", json=user_data)
+                url_router = f"{API_URL}/users"
+                response = requests.post(url_router, json=user_data)
                 if response.status_code == 200:
                     mensagem = f"Usuário {username} criado com sucesso!"
-                    flash(mensagem)
+                    flash(mensagem, category='success')
                     return redirect(url_for("login"))
                 else: 
                     error_message = f"User {username} is already registered."
@@ -95,7 +98,7 @@ def register():
             except IOError: 
                 error_message = "Erro de IO durante o login"
         
-        flash(error_message)                
+        flash(error_message, category='danger')                
         return render_template("auth/register.html", error_message=error_message)
     return render_template("auth/register.html")
 
@@ -123,16 +126,22 @@ def dashboard():
         response = requests.get(url_router, headers=headers)
     
         if response.status_code == 200:
-            dadosDashboardDTO = dto.DadosDashboardDTO(lista_usuarios=[], lista_imagens=[], lista_analises=[], lista_notas=[])
             user_data = response.json()            
             url_route_profile = f"{API_URL}/users/{usuario_logado}/profile"
             response_profile = requests.get(url_route_profile, headers=headers)
 
             if response_profile.status_code == 200:
-                user_data_profile = response_profile.json()     
+                user_data_profile = response_profile.json()
+                url_route_all_notes = f"{API_URL}/users/{usuario_logado}/notes"
+                session['profile_image_url'] = user_data_profile['profile_image_url']
+                response_all_notes = requests.get(url_route_all_notes, headers=headers)
+                
+                if response_all_notes.status_code == 200:
+                    notes_data = response_all_notes.json()
+                    dadosDashboardDTO = dto.DadosDashboardDTO(lista_usuarios=[], lista_imagens=[], lista_analises=[], lista_notas=notes_data)
 
                 return render_template("dashboard/starter.html", user=user_data, usuario = usuario_logado, 
-                    profilePic=user_data_profile["profile_image_url"], titulo="Dashboard",dadosDashboardDTO=dadosDashboardDTO)
+                    profilePic=session['profile_image_url'], titulo="Dashboard",dadosDashboardDTO=dadosDashboardDTO)
         else:
             # Handle error retrieving user information
             error_message = f"Failed to retrieve user information - {response.status_code}"
@@ -146,7 +155,7 @@ def dashboard():
         error_message = "Erro de IO"    
     except Exception as ex:
         error_message = f"Erro: {str(ex)}"
-    flash(error_message)
+    flash(error_message, category='danger')
 
     return render_template("auth/login.html", error_message=error_message)
 
@@ -181,7 +190,7 @@ def profile():
         error_message = "Erro de IO"    
     except Exception as ex:
         error_message = f"Erro: {str(ex)}"
-    flash(error_message)
+    flash(error_message, category='danger')
 
     return render_template("auth/login.html", error_message=error_message)
 
@@ -234,7 +243,7 @@ def update_profile_image():
         error_message = "Erro de IO"    
     except Exception as ex:
         error_message = f"Erro: {str(ex)}"
-    flash(error_message)
+    flash(error_message, category='danger')
 
     return render_template("auth/login.html", error_message=error_message)
 
@@ -252,8 +261,13 @@ def listar_notas():
         response = requests.get(url_route, headers=headers)
 
         if response.status_code == 200:
-            user_data = response.json()            
-            return render_template("notas/listar_notas.html", usuario = usuario_logado, titulo="Notas", profilePic=user_data["profile_image_url"])
+            user_data = response.json() 
+            url_route_all_notes = f"{API_URL}/users/{usuario_logado}/notes"
+            response_all_notes = requests.get(url_route_all_notes, headers=headers)
+            if response_all_notes.status_code == 200:
+                notes_data = response_all_notes.json()
+                return render_template("notas/listar_notas.html", usuario = usuario_logado, titulo="Notas", 
+                profilePic=user_data["profile_image_url"], notas = notes_data)
         else:
             # Handle error retrieving user information
             error_message = f"Failed to retrieve user information - {response.status_code}"
@@ -267,46 +281,50 @@ def listar_notas():
         error_message = "Erro de IO"    
     except Exception as ex:
         error_message = f"Erro: {str(ex)}"
-    flash(error_message)
+    flash(error_message, category='danger')
 
-    return render_template("notas/listar_notas.html", error_message=error_message)
+    return render_template("notas/listar_notas.html", profilePic=session['profile_image_url'], error_message=error_message)
 
 @my_app.route("/nota", methods=['GET', 'POST'])
 def nova_nota():
     if "username" not in session:
         return redirect(url_for("login"))
 
-    if request.method == 'POST':
-     print('Not implemented!')
-     return 
+    # Recupera informacoes do backend usando o token
+    access_token = session["access_token"] 
+    headers = {"Authorization": f"Bearer {access_token}"}
+    usuario_logado = session["username"]
+    error_message = None
 
-    try:
-        # Recupera informacoes do backend usando o token
-        access_token = session["access_token"] 
-        headers = {"Authorization": f"Bearer {access_token}"}
-        usuario_logado = session["username"]
-        url_route = f"{API_URL}/users/{usuario_logado}/profile"
-        response = requests.get(url_route, headers=headers)
+    if request.method == "POST":
+        descricao = request.form["descricaonota"]
+        if not descricao:
+            error_message = "A descriçãoo é um campo obrigatório!"
 
-        if response.status_code == 200:
-            user_data = response.json()            
-            return render_template("notas/nova_nota.html", usuario = usuario_logado, titulo="Nova Nota", profilePic=user_data["profile_image_url"])
-        else:
-            # Handle error retrieving user information
-            error_message = f"Failed to retrieve user information - {response.status_code}"
-            return render_template("error.html", message=error_message)
+        if error_message is None:
+            try: 
+                # Send user data to FastAPI app
+                descricao_data = {'id': 0, "description": descricao}
+                response = requests.post(f"{API_URL}/users/{usuario_logado}/notes", json=descricao_data, headers=headers)
 
-    except requests.exceptions.MissingSchema:
-        error_message = f"URL {url_route} inválida"
-    except requests.exceptions.ConnectionError:
-        error_message = "Erro de conexão"
-    except IOError: 
-        error_message = "Erro de IO"    
-    except Exception as ex:
-        error_message = f"Erro: {str(ex)}"
-    flash(error_message)
+                if response.status_code == 200:
+                    mensagem = f"Nota criada com sucesso!"
+                    flash(mensagem, category='success')
+                    return redirect(url_for("listar_notas"))
+                else: 
+                    error_message = f"Erro {response.status_code} ao cadastrar a nota!: {response.content}"
+                
+            except requests.exceptions.MissingSchema:
+                error_message = f"URL {API_URL}/notes inválida!"
+            except requests.exceptions.ConnectionError:
+                error_message = "Erro de conexão na tentativa de cadastro de nota."
+            except IOError: 
+                error_message = "Erro de IO durante o cadastro da nota."
+        
+        flash(error_message, category='danger')                
+        return render_template("notas/nova_nota.html", titulo="Nova nota", usuario=usuario_logado, profilePic=session['profile_image_url'], error_message=error_message)
 
-    return render_template("notas/listar_notas.html", error_message=error_message)
+    return render_template("notas/nova_nota.html", titulo="Nova nota", usuario=usuario_logado, profilePic=session['profile_image_url'], error_message=error_message)
 
 
 if __name__ == "__main__":
