@@ -149,12 +149,12 @@ class NotesDAO:
     except Exception as ex:
       raise ValueError(f"Error updating note: {str(ex)}, status_code=400")
 
-def delete_note(self, note_id: int, user_id: int) -> None:
-  try:
-    note = self.db.query(modelos.NoteDB).filter(modelos.NoteDB.id == note_id and modelos.NoteDB.user_id==user_id).first()
-    if not note:
-      raise ValueError("Note not found")
-    self.db.delete(note)
-    self.db.commit()
-  except Exception as ex:
-    raise ValueError(f"Error deleting note: {str(ex)}, status_code=400")
+  def delete_note(self, note_id: int, user_id: int) -> None:
+    try:
+      note = self.db.query(modelos.NoteDB).filter(modelos.NoteDB.id == note_id and modelos.NoteDB.user_id==user_id).first()
+      if not note:
+        raise ValueError("Note not found")
+      self.db.delete(note)
+      self.db.commit()
+    except Exception as ex:
+      raise ValueError(f"Error deleting note: {str(ex)}, status_code=400")
