@@ -14,11 +14,11 @@
                     <div class="card-header">
                         <h3 class="card-title">Nota</h3>
                     </div>
-                    <form>
+                    <form action="{{ url_for('nova_nota') }}" method="post">
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="descricaonota">Descrição</label>
-                                <input type="text" class="form-control" id="descricaonota" placeholder="Entre com a descrição">
+                                <input type="text" class="form-control" name="descricaonota" id="descricaonota" placeholder="Entre com a descrição">
                             </div>
                         </div>
                         <div class="card-footer">

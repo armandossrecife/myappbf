@@ -34,6 +34,4 @@ class NoteDB(Base):
   __tablename__ = "notes"
   id = Column(Integer, primary_key=True, autoincrement=True)
   description = Column(String(1024))
-  insertion_date = Column(DateTime, default=datetime.now())
-  edition_date = Column(DateTime, onupdate=datetime.now())
   user_id = Column(Integer, ForeignKey("users.id"))
